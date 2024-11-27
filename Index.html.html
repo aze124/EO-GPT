@@ -1,0 +1,152 @@
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<style type="text/css">body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .copy-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+</style>
+<div class="container">
+<h1>Lua Deobfuscator</h1>
+<textarea aria-label="Obfuscated Lua Code" id="luaCode" placeholder="Paste obfuscated Lua code here..."></textarea><button id="deobfuscateBtn">Deobfuscate</button>
+
+<div class="loading" id="loading">Processing...</div>
+
+<div class="error" id="error"> </div>
+
+<h3>Result:</h3>
+
+<pre id="result">
+
+ </pre>
+<button class="copy-btn" id="copyBtn" style="display: none;">Copy Result</button></div>
+<script>
+        document.getElementById('deobfuscateBtn').onclick = function() {
+            const luaCode = document.getElementById('luaCode').value.trim();
+            const loadingIndicator = document.getElementById('loading');
+            const resultArea = document.getElementById('result');
+            const errorArea = document.getElementById('error');
+            const copyBtn = document.getElementById('copyBtn');
+
+            // Clear previous results and errors
+            resultArea.textContent = '';
+            errorArea.textContent = '';
+            copyBtn.style.display = 'none';
+
+            if (!luaCode) {
+                errorArea.textContent = 'Please enter valid Lua code.';
+                return;
+            }
+
+            loadingIndicator.style.display = 'block';
+
+            fetch('/deobfuscate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: luaCode })
+            })
+            .then(response => {
+                loadingIndicator.style.display = 'none';
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                resultArea.textContent = data.result;
+                copyBtn.style.display = 'block'; // Show copy button
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                errorArea.textContent = `Error: ${error.message}`;
+            });
+        };
+
+        // Copy result to clipboard
+        document.getElementById('copyBtn').onclick = function() {
+            const resultText = document.getElementById('result').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                alert('Result copied to clipboard!');
+            }, (err) => {
+                alert('Failed to copy: ', err);
+            });
+        };
+    </script>
