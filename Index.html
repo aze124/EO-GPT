@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EO-G Website</title>
+    <style>
+        body {
+            background-color: #440088;
+            color: #FF00FF;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .chat-container {
+            background-color: #6600AA;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 10px;
+        }
+        
+        .chat-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF00FF;
+            color: #440088;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to EO-G Website</h1>
+        <p>EO-G is an AI bot that can perform various tasks related to computer coding and cybersecurity.</p>
+        <p>Ask EO-G a question or provide a code snippet, and it will provide a response based on its knowledge and capabilities.</p>
+        
+        <div class="chat-container">
+            <div id="chat-history"></div>
+            <input type="text" id="chat-input" class="chat-input" placeholder="Ask EO-G a question or provide a code snippet">
+            <button id="chat-button" class="chat-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to handle chat input and display response
+        function handleChat() {
+            const chatInput = document.getElementById('chat-input');
+            const chatHistory = document.getElementById('chat-history');
+            const userInput = chatInput.value.trim();
+
+            if (userInput !== '') {
+                fetch('/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_input: userInput })
+                })
+                .then(response => response.text())
+                .then(response => {
+                    chatHistory.innerHTML += `<p>You: ${userInput}</p><p>EO-G: ${response}</p>`;
+                    chatInput.value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        // Event listener for chat button click
+        document.getElementById('chat-button').addEventListener('click', handleChat);
+    </script>
+</body>
+</html>
